@@ -7,7 +7,7 @@ const AsBuiltFormSelector = () => {
 
   // Form definitions with local file paths
   // PDFs should be placed in the public/forms/ folder
-  const forms = {
+  const formDefinitions = {
     '360S014EA': {
       name: 'As-built Low Voltage Connection Record',
       fileName: '360S014EA.pdf'
@@ -214,7 +214,7 @@ const AsBuiltFormSelector = () => {
       commissioningCerts: ['220F028A', '220F028F']
     },
     'HV Extensions - Underground': {
-      forms: ['360S014EB', '360S014EE', '360S014EG', '360S014EH', '360S014EJ', '220F028EL', 'MFG_CERT'],
+      forms: ['360S014EB', '360S014EE', '360S014EG', '360S014EH', '360S014EJ', '360S014EL', 'MFG_CERT'],
       notes: 'Equip Record Card or Form',
       commissioningCerts: ['220F028A', '220F028G']
     },
@@ -263,7 +263,7 @@ const AsBuiltFormSelector = () => {
     const mapping = workTypeMapping[selectedWork];
     
     const forms = mapping.forms.map(formId => {
-      const formData = forms[formId];
+      const formData = formDefinitions[formId];
       const basePath = import.meta.env.BASE_URL;
       const formUrl = formData.fileName ? `${basePath}forms/${formData.fileName}` : null;
       const alternateUrl = formData.alternateFileName ? `${basePath}forms/${formData.alternateFileName}` : null;
