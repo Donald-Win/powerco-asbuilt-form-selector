@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download } from 'lucide-react';
+import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp } from 'lucide-react';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -107,93 +107,148 @@ const AsBuiltFormSelector = () => {
     }
   };
 
+  // Commissioning & Test Certificates (220F028 series)
+  const commissioningCerts = {
+    '220F028A': {
+      name: 'Pre-Commissioning HV Inspection Certificate – Minor Works',
+      fileName: '220F028A.pdf'
+    },
+    '220F028B': {
+      name: 'Distribution Transformer Commissioning Certificate',
+      fileName: '220F028B.pdf'
+    },
+    '220F028C': {
+      name: 'LV Service Boxes, Cabinets and Subterranean Vaults Commissioning Certificate',
+      fileName: '220F028C.pdf'
+    },
+    '220F028D': {
+      name: 'LV Link Boxes and Link Cabinets Test Certificate',
+      fileName: '220F028D.pdf'
+    },
+    '220F028E': {
+      name: 'LV Customer Connection and Polarity Checks Test Certificate',
+      fileName: '220F028E.pdf'
+    },
+    '220F028F': {
+      name: 'Overhead LV Distribution Circuit Test Certificate',
+      fileName: '220F028F.pdf'
+    },
+    '220F028G': {
+      name: 'Underground LV Distribution Circuit Test Certificate',
+      fileName: '220F028G.pdf'
+    }
+  };
+
   // Work type to forms mapping based on the matrix
   const workTypeMapping = {
     'LV Service Connection - OH and UG': {
       forms: ['360S014EA'],
-      notes: 'New or Altered Connections'
+      notes: 'New or Altered Connections',
+      commissioningCerts: ['220F028E']
     },
     'LV Distribution Network': {
       forms: ['360S014EB', '360S014EC', '360S014EL'],
-      notes: 'For UG Distribution Network (360S014EL)'
+      notes: 'For UG Distribution Network (360S014EL)',
+      commissioningCerts: ['220F028F', '220F028G', '220F028C']
     },
     'HV Distribution Network': {
       forms: ['360S014EB', '360S014EC', '360S014EE', '360S014EL'],
-      notes: 'For UG Distribution Network (360S014EL)'
+      notes: 'For UG Distribution Network (360S014EL)',
+      commissioningCerts: ['220F028A', '220F028F', '220F028G']
     },
     'Poles': {
       forms: ['360S014EC', '360S014EE'],
-      notes: 'Either As-Built Pole Record Form or Network Asset Design Register can be used'
+      notes: 'Either As-Built Pole Record Form or Network Asset Design Register can be used',
+      commissioningCerts: []
     },
     'Crossarms': {
-      forms: ['360S014EC']
+      forms: ['360S014EC'],
+      commissioningCerts: []
     },
     'Equipment (installation/changes)': {
       forms: ['360S014EE', '360S014EH', '360S014EJ', 'MFG_CERT'],
-      notes: 'EE: Any equipment not specified elsewhere; EH: For Critical Spares; EJ: Where an Earth Test has been taken'
+      notes: 'EE: Any equipment not specified elsewhere; EH: For Critical Spares; EJ: Where an Earth Test has been taken',
+      commissioningCerts: ['220F028A']
     },
     'Zone Substations': {
       forms: ['360S014EF', '360S014EE', '360S014EH', '360F019CA'],
-      notes: 'For any Engineering as-built drawings (360F019CA)'
+      notes: 'For any Engineering as-built drawings (360F019CA)',
+      commissioningCerts: ['220F028A']
     },
     'Transformers - Overhead': {
       forms: ['360S014EC', '360S014EG', '360S014EH', '360S014EE', '360S014EJ', 'MFG_CERT'],
-      notes: 'Equip Record Card or Form (EG or EH)'
+      notes: 'Equip Record Card or Form (EG or EH)',
+      commissioningCerts: ['220F028A', '220F028B']
     },
     'Transformers - Ground mount': {
       forms: ['360S014EG', '360S014EH', '360S014EE', '360S014EJ', 'MFG_CERT'],
-      notes: 'Equip Record Card or Form (EG or EH)'
+      notes: 'Equip Record Card or Form (EG or EH)',
+      commissioningCerts: ['220F028A', '220F028B']
     },
     'LV Service Box': {
       forms: ['360S014ED'],
-      notes: 'For boxes containing service fuses only'
+      notes: 'For boxes containing service fuses only',
+      commissioningCerts: ['220F028C']
     },
     'LV Distribution Box': {
       forms: ['360S014EC', '360S014ED', '360S014EJ'],
-      notes: 'For vertical disconnects (Pillar) use ED; For horizontal disconnects (Link) use ED'
+      notes: 'For vertical disconnects (Pillar) use ED; For horizontal disconnects (Link) use ED',
+      commissioningCerts: ['220F028C', '220F028D']
     },
     'Earth Test / Alterations': {
-      forms: ['360S014EJ']
+      forms: ['360S014EJ'],
+      commissioningCerts: []
     },
     'Streetlights': {
-      forms: ['360S014EK']
+      forms: ['360S014EK'],
+      commissioningCerts: []
     },
     'Subdivisions - Underground': {
       forms: ['360S014EC', '360S014EB', '360S014EG', '360S014EH', '360S014EE', '360S014EJ', '360S014EL', 'MFG_CERT'],
-      notes: 'A plan detailing all cable details is allowed'
+      notes: 'A plan detailing all cable details is allowed',
+      commissioningCerts: ['220F028E', '220F028G', '220F028C', '220F028B']
     },
     'HV Extensions - Overhead': {
       forms: ['360S014EB', '360S014EC', '360S014EE', '360S014EG', '360S014EH', '360S014EJ', 'MFG_CERT'],
-      notes: 'Equip Record Card or Form'
+      notes: 'Equip Record Card or Form',
+      commissioningCerts: ['220F028A', '220F028F']
     },
     'HV Extensions - Underground': {
-      forms: ['360S014EB', '360S014EE', '360S014EG', '360S014EH', '360S014EJ', '360S014EL', 'MFG_CERT'],
-      notes: 'Equip Record Card or Form'
+      forms: ['360S014EB', '360S014EE', '360S014EG', '360S014EH', '360S014EJ', '220F028EL', 'MFG_CERT'],
+      notes: 'Equip Record Card or Form',
+      commissioningCerts: ['220F028A', '220F028G']
     },
     'LV Feed Area Change': {
-      forms: ['360S014EO']
+      forms: ['360S014EO'],
+      commissioningCerts: []
     },
     'HV Switchgear': {
       forms: ['360S014EF', '360S014EH', '360S014EE', 'MFG_CERT'],
-      notes: 'A separate form for each piece of equipment. EH: For Critical Spares'
+      notes: 'A separate form for each piece of equipment. EH: For Critical Spares',
+      commissioningCerts: ['220F028A']
     },
     'Protection Relay (new and replacement)': {
-      forms: ['360S014EP']
+      forms: ['360S014EP'],
+      commissioningCerts: ['220F028A']
     },
     'Communications Sites': {
       forms: ['360S014EV', '360F019CA'],
-      notes: 'For any Engineering as-built drawings. Repeater Stations and Base Comms'
+      notes: 'For any Engineering as-built drawings. Repeater Stations and Base Comms',
+      commissioningCerts: []
     },
     'Communications RTU Sites': {
       forms: ['360S014EW'],
-      notes: 'RTU Sites and LFI Sites'
+      notes: 'RTU Sites and LFI Sites',
+      commissioningCerts: []
     },
     'Line Fault Indicators': {
       forms: ['360S014ER', '360S014ES', '360S014ET', '360S014EU'],
-      notes: 'Use forms 360S014ER - 360S014EU based on indicator type'
+      notes: 'Use forms 360S014ER - 360S014EU based on indicator type',
+      commissioningCerts: []
     },
     'Load Control Relays': {
-      forms: ['360S014EC']
+      forms: ['360S014EC'],
+      commissioningCerts: []
     }
   };
 
@@ -204,11 +259,11 @@ const AsBuiltFormSelector = () => {
   );
 
   const getRequiredForms = () => {
-    if (!selectedWork) return [];
+    if (!selectedWork) return { forms: [], commissioningCerts: [] };
     const mapping = workTypeMapping[selectedWork];
-    return mapping.forms.map(formId => {
+    
+    const forms = mapping.forms.map(formId => {
       const formData = forms[formId];
-      // Use base URL from Vite config for proper path resolution
       const basePath = import.meta.env.BASE_URL;
       const formUrl = formData.fileName ? `${basePath}forms/${formData.fileName}` : null;
       const alternateUrl = formData.alternateFileName ? `${basePath}forms/${formData.alternateFileName}` : null;
@@ -221,6 +276,21 @@ const AsBuiltFormSelector = () => {
         hasLink: !!formUrl
       };
     });
+    
+    const certs = (mapping.commissioningCerts || []).map(certId => {
+      const certData = commissioningCerts[certId];
+      const basePath = import.meta.env.BASE_URL;
+      const certUrl = certData.fileName ? `${basePath}forms/${certData.fileName}` : null;
+      
+      return {
+        id: certId,
+        name: certData.name,
+        url: certUrl,
+        hasLink: !!certUrl
+      };
+    });
+    
+    return { forms, commissioningCerts: certs };
   };
 
   const handleFormClick = (url) => {
@@ -229,7 +299,8 @@ const AsBuiltFormSelector = () => {
     }
   };
 
-  const requiredForms = getRequiredForms();
+  const { forms: requiredForms, commissioningCerts: requiredCerts } = getRequiredForms();
+  const [showCommissioning, setShowCommissioning] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -366,6 +437,75 @@ const AsBuiltFormSelector = () => {
                 <strong>Reminder:</strong> Depending on the work undertaken, one or multiple as-built forms may be required. Pre-commissioning and commissioning test forms should be uploaded separately from the workpack.
               </p>
             </div>
+
+            {/* Commissioning & Test Certificates Section */}
+            {requiredCerts.length > 0 && (
+              <div className="mt-6">
+                <button
+                  onClick={() => setShowCommissioning(!showCommissioning)}
+                  className="w-full flex items-center justify-between p-4 bg-green-50 border-2 border-green-300 rounded-lg hover:bg-green-100 transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <FileText className="text-green-700" size={20} />
+                    <span className="font-semibold text-green-900">
+                      Commissioning & Test Certificates ({requiredCerts.length})
+                    </span>
+                  </div>
+                  {showCommissioning ? (
+                    <ChevronUp className="text-green-700" size={20} />
+                  ) : (
+                    <ChevronDown className="text-green-700" size={20} />
+                  )}
+                </button>
+
+                {showCommissioning && (
+                  <div className="mt-3 space-y-3 animate-fadeIn">
+                    {requiredCerts.map((cert, index) => (
+                      <div
+                        key={cert.id}
+                        onClick={() => cert.hasLink && handleFormClick(cert.url)}
+                        className={`p-4 border-2 rounded-lg ${
+                          cert.hasLink 
+                            ? 'border-green-200 bg-green-50 cursor-pointer hover:bg-green-100 hover:border-green-300 active:bg-green-200 transition-all'
+                            : 'border-gray-200 bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold text-green-900">
+                                {cert.id}
+                              </p>
+                              {cert.hasLink && (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white text-xs rounded-full">
+                                  <Download size={12} />
+                                  <span>Download</span>
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-700 mt-1">
+                              {cert.name}
+                            </p>
+                          </div>
+                          {cert.hasLink && (
+                            <ExternalLink className="flex-shrink-0 text-green-600" size={20} />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <p className="text-xs text-green-800">
+                        <strong>Note:</strong> These commissioning and test certificates verify that installed equipment is safe and ready for service. Complete and submit these separately from as-built documentation forms.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
