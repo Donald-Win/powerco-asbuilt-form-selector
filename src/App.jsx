@@ -1,36 +1,110 @@
 import React, { useState } from 'react';
-import { Search, FileText, CheckCircle2, Circle } from 'lucide-react';
+import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download } from 'lucide-react';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Form definitions
+  // Form definitions with local file paths
+  // PDFs should be placed in the public/forms/ folder
   const forms = {
-    '360S014EA': 'As-built Low Voltage Connection Record',
-    '360S014EB': 'As-built Electrical Distribution Record',
-    '360S014EC': 'As-built Pole Record (PDF or Excel)',
-    '360S014ED': 'As-built LV Box Record',
-    '360S014EE': 'As-built Electrical Equipment Record',
-    '360S014EF': 'As-built Zone Substation Equipment Record',
-    '360S014EG': 'As-built Transformer Record',
-    '360S014EH': 'As-built Equipment Record Cards',
-    '360S014EI': 'As-built Underground Network Distribution Panel Layout Record',
-    '360S014EJ': 'As-built Earth Installation and Test Record',
-    '360S014EK': 'As-built Streetlight Alteration/Installation Record',
-    '360S014EL': 'As-built Cable Test Report',
-    '360S014EM': 'As-built Requirements Checklist - Zone Substation',
-    '360S014EO': 'As-built Transformer ICP Change Form',
-    '360S014EP': 'As-built Protection Relay Record',
-    '360S014EQ': 'Commissioning Conductor Tension Method & Results/Run Form',
-    '360S014ER': 'As-built Line Fault Indicator Record LM2SAT',
-    '360S014ES': 'As-built Line Fault Indicator Record PM3SAT',
-    '360S014ET': 'As-built Line Fault Indicator Record PM6SAT',
-    '360S014EU': 'As-built Line Fault Indicator Record PM9SAT',
-    '360S014EV': 'As-built Network Communications Equipment Record',
-    '360S014EW': 'As-built Remote Terminal Unit Equipment Record',
-    '360F019CA': 'Drawing Approval Form',
-    'MFG_CERT': 'Manufacturer Test Certificates'
+    '360S014EA': {
+      name: 'As-built Low Voltage Connection Record',
+      fileName: '360S014EA.pdf'
+    },
+    '360S014EB': {
+      name: 'As-built Electrical Distribution Record',
+      fileName: '360S014EB.pdf'
+    },
+    '360S014EC': {
+      name: 'As-built Pole Record (PDF or Excel)',
+      fileName: '360S014EC.pdf',
+      alternateFileName: '360S014EC.xlsx'
+    },
+    '360S014ED': {
+      name: 'As-built LV Box Record',
+      fileName: '360S014ED.pdf'
+    },
+    '360S014EE': {
+      name: 'As-built Electrical Equipment Record',
+      fileName: '360S014EE.pdf'
+    },
+    '360S014EF': {
+      name: 'As-built Zone Substation Equipment Record',
+      fileName: '360S014EF.pdf'
+    },
+    '360S014EG': {
+      name: 'As-built Transformer Record',
+      fileName: '360S014EG.pdf'
+    },
+    '360S014EH': {
+      name: 'As-built Equipment Record Cards',
+      fileName: '360S014EH.pdf'
+    },
+    '360S014EI': {
+      name: 'As-built Underground Network Distribution Panel Layout Record',
+      fileName: '360S014EI.pdf'
+    },
+    '360S014EJ': {
+      name: 'As-built Earth Installation and Test Record',
+      fileName: '360S014EJ.pdf'
+    },
+    '360S014EK': {
+      name: 'As-built Streetlight Alteration/Installation Record',
+      fileName: '360S014EK.pdf'
+    },
+    '360S014EL': {
+      name: 'As-built Cable Test Report',
+      fileName: '360S014EL.pdf'
+    },
+    '360S014EM': {
+      name: 'As-built Requirements Checklist - Zone Substation',
+      fileName: '360S014EM.pdf'
+    },
+    '360S014EO': {
+      name: 'As-built Transformer ICP Change Form',
+      fileName: '360S014EO.pdf'
+    },
+    '360S014EP': {
+      name: 'As-built Protection Relay Record',
+      fileName: '360S014EP.pdf'
+    },
+    '360S014EQ': {
+      name: 'Commissioning Conductor Tension Method & Results/Run Form',
+      fileName: '360S014EQ.pdf'
+    },
+    '360S014ER': {
+      name: 'As-built Line Fault Indicator Record LM2SAT',
+      fileName: '360S014ER.pdf'
+    },
+    '360S014ES': {
+      name: 'As-built Line Fault Indicator Record PM3SAT',
+      fileName: '360S014ES.pdf'
+    },
+    '360S014ET': {
+      name: 'As-built Line Fault Indicator Record PM6SAT',
+      fileName: '360S014ET.pdf'
+    },
+    '360S014EU': {
+      name: 'As-built Line Fault Indicator Record PM9SAT',
+      fileName: '360S014EU.pdf'
+    },
+    '360S014EV': {
+      name: 'As-built Network Communications Equipment Record',
+      fileName: '360S014EV.pdf'
+    },
+    '360S014EW': {
+      name: 'As-built Remote Terminal Unit Equipment Record',
+      fileName: '360S014EW.pdf'
+    },
+    '360F019CA': {
+      name: 'Drawing Approval Form',
+      fileName: '360F019CA.pdf'
+    },
+    'MFG_CERT': {
+      name: 'Manufacturer Test Certificates',
+      fileName: null // No file - varies by manufacturer
+    }
   };
 
   // Work type to forms mapping based on the matrix
@@ -132,10 +206,27 @@ const AsBuiltFormSelector = () => {
   const getRequiredForms = () => {
     if (!selectedWork) return [];
     const mapping = workTypeMapping[selectedWork];
-    return mapping.forms.map(formId => ({
-      id: formId,
-      name: forms[formId]
-    }));
+    return mapping.forms.map(formId => {
+      const formData = forms[formId];
+      // Use base URL from Vite config for proper path resolution
+      const basePath = import.meta.env.BASE_URL;
+      const formUrl = formData.fileName ? `${basePath}forms/${formData.fileName}` : null;
+      const alternateUrl = formData.alternateFileName ? `${basePath}forms/${formData.alternateFileName}` : null;
+      
+      return {
+        id: formId,
+        name: formData.name,
+        url: formUrl,
+        alternateUrl: alternateUrl,
+        hasLink: !!formUrl
+      };
+    });
+  };
+
+  const handleFormClick = (url) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const requiredForms = getRequiredForms();
@@ -218,20 +309,53 @@ const AsBuiltFormSelector = () => {
               {requiredForms.map((form, index) => (
                 <div
                   key={form.id}
-                  className="p-4 border-2 border-indigo-200 rounded-lg bg-indigo-50"
+                  onClick={() => form.hasLink && handleFormClick(form.url)}
+                  className={`p-4 border-2 rounded-lg ${
+                    form.hasLink 
+                      ? 'border-indigo-200 bg-indigo-50 cursor-pointer hover:bg-indigo-100 hover:border-indigo-300 active:bg-indigo-200 transition-all'
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                       {index + 1}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-indigo-900">
-                        {form.id}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-indigo-900">
+                          {form.id}
+                        </p>
+                        {form.hasLink && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-600 text-white text-xs rounded-full">
+                            <Download size={12} />
+                            <span>Download</span>
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-700 mt-1">
                         {form.name}
                       </p>
+                      {form.alternateUrl && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleFormClick(form.alternateUrl);
+                          }}
+                          className="mt-2 text-xs text-indigo-600 hover:text-indigo-800 underline flex items-center gap-1"
+                        >
+                          <ExternalLink size={12} />
+                          Download Excel version
+                        </button>
+                      )}
+                      {!form.hasLink && form.id === 'MFG_CERT' && (
+                        <p className="text-xs text-gray-500 mt-1 italic">
+                          Contact manufacturer for specific certificates
+                        </p>
+                      )}
                     </div>
+                    {form.hasLink && (
+                      <ExternalLink className="flex-shrink-0 text-indigo-600" size={20} />
+                    )}
                   </div>
                 </div>
               ))}
@@ -260,3 +384,4 @@ const AsBuiltFormSelector = () => {
 };
 
 export default AsBuiltFormSelector;
+
