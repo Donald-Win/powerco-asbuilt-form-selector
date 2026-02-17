@@ -1,10 +1,10 @@
-const CACHE_NAME = 'powerco-asbuilt-v1';
+const CACHE_NAME = 'powerco-asbuilt-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Install event - cache assets
@@ -71,3 +71,4 @@ self.addEventListener('activate', (event) => {
   );
   self.clients.claim();
 });
+
