@@ -145,7 +145,7 @@ const AsBuiltFormSelector = () => {
   const tailgateForm = {
     id: 'TAILGATE',
     name: 'Pre-Work Risk Assessment (Tailgate) Form',
-    fileName: 'Tailgate_Form.pdf'
+    fileName: 'Tailgate.pdf'
   };
 
   // Northpower internal test / verification sheets
