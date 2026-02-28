@@ -17,9 +17,8 @@ const AsBuiltFormSelector = () => {
       fileName: '360S014EB.pdf'
     },
     '360S014EC': {
-      name: 'As-built Pole Record (PDF or Excel)',
-      fileName: '360S014EC.pdf',
-      alternateFileName: '360S014EC.xlsx'
+      name: 'As-built Pole Record',
+      fileName: '360S014EC.pdf'
     },
     '360S014ED': {
       name: 'As-built LV Box Record',
