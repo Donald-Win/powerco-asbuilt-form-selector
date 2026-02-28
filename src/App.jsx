@@ -242,8 +242,8 @@ const AsBuiltFormSelector = () => {
     ? workTypeMapping[selectedWork].forms.map(formId => ({
         id: formId,
         name: formDefinitions[formId]?.name || 'Unknown Form',
-        url: formDefinitions[formId]?.fileName ? `/forms/${formDefinitions[formId].fileName}` : null,
-        alternateUrl: formDefinitions[formId]?.alternateFileName ? `/forms/${formDefinitions[formId].alternateFileName}` : null,
+        url: formDefinitions[formId]?.fileName ? `forms/${formDefinitions[formId].fileName}` : null,
+        alternateUrl: formDefinitions[formId]?.alternateFileName ? `forms/${formDefinitions[formId].alternateFileName}` : null,
         hasLink: !!formDefinitions[formId]?.fileName
       }))
     : [];
@@ -252,7 +252,7 @@ const AsBuiltFormSelector = () => {
     ? workTypeMapping[selectedWork].commissioningCerts.map(certId => ({
         id: certId,
         name: commissioningCerts[certId]?.name || 'Unknown Certificate',
-        url: commissioningCerts[certId]?.fileName ? `/forms/${commissioningCerts[certId].fileName}` : null,
+        url: commissioningCerts[certId]?.fileName ? `forms/${commissioningCerts[certId].fileName}` : null,
         hasLink: !!commissioningCerts[certId]?.fileName
       }))
     : [];
@@ -263,8 +263,8 @@ const AsBuiltFormSelector = () => {
     .map(([id, form]) => ({
       id,
       name: form.name,
-      url: form.fileName ? `/forms/${form.fileName}` : null,
-      alternateUrl: form.alternateFileName ? `/forms/${form.alternateFileName}` : null,
+      url: form.fileName ? `forms/${form.fileName}` : null,
+      alternateUrl: form.alternateFileName ? `forms/${form.alternateFileName}` : null,
       hasLink: !!form.fileName
     }))
     .filter(form => 
