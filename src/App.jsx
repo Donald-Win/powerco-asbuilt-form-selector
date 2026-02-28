@@ -276,7 +276,7 @@ const AsBuiltFormSelector = () => {
     .map(([id, cert]) => ({
       id,
       name: cert.name,
-      url: cert.fileName ? `/forms/${cert.fileName}` : null,
+      url: cert.fileName ? `forms/${cert.fileName}` : null,
       hasLink: !!cert.fileName
     }))
     .filter(cert => 
