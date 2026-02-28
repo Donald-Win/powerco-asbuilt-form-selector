@@ -1,11 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Replace 'your-repo-name' with your actual GitHub repository name
 export default defineConfig({
   plugins: [react()],
   base: '/powerco-asbuilt-form-selector/',
+  
+  // Add this build configuration
   build: {
-    outDir: 'dist',
-  },
+    rollupOptions: {
+      output: {
+        // Include service worker in build
+        manualChunks: undefined,
+      }
+    }
+  }
 })
