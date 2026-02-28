@@ -152,7 +152,7 @@ const AsBuiltFormSelector = () => {
   const testSheets = {
     'TSTSHT-0051-1': {
       name: 'LV Connection Testing Verification Sheet',
-      fileName: '51-1_Testing_Verification_Results_for_Low_Voltage_Connection_Check_Sheet.PDF'
+      fileName: '51-1_Test_Sheet.PDF'
     },
     'DIST-TX-TEST': {
       name: 'Distribution Transformer Test Verification Sheet',
