@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '1.3.8';
+const APP_VERSION = '1.3.9';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -141,6 +141,29 @@ const AsBuiltFormSelector = () => {
     '220F028G': {
       name: 'Underground LV Distribution Circuit Test Certificate',
       fileName: '220F028G.pdf'
+    }
+  };
+
+  // Tailgate / Pre-Work Risk Assessment form
+  const tailgateForm = {
+    id: 'TAILGATE',
+    name: 'Pre-Work Risk Assessment (Tailgate) Form',
+    fileName: 'Tailgate.pdf'
+  };
+
+  // Northpower internal test / verification sheets
+  const testSheets = {
+    'TSTSHT-0051-1': {
+      name: 'LV Connection Testing Verification Sheet',
+      fileName: '51-1_Test_Sheet.PDF'
+    },
+    'DIST-TX-TEST': {
+      name: 'Distribution Transformer Test Verification Sheet',
+      fileName: 'Distribution_Transformer_Test_Verification_Check_Sheet.PDF'
+    },
+    'HV-CABLE-TEST': {
+      name: 'HV Cables Test Sheet',
+      fileName: 'HV_Cables_Test_Check_Sheet.PDF'
     }
   };
 
