@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '2.0.1';
+const APP_VERSION = '2.0.2';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -255,7 +255,7 @@ const AsBuiltFormSelector = () => {
   };
 
   const handleFormClick = (url) => {
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   // Filter work types based on search
@@ -366,6 +366,15 @@ const AsBuiltFormSelector = () => {
             </button>
           </div>
         </div>
+
+        {/* iPad/iOS Helper Banner */}
+        {/iPad|iPhone|iPod/.test(navigator.userAgent) && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg mb-6">
+            <p className="text-sm text-blue-900">
+              <strong>💡 iPad Tip:</strong> After opening a form, tap the <strong>Share</strong> button (□↑) at the top of the screen to save or print. Swipe down to return to this app.
+            </p>
+          </div>
+        )}
 
         {/* Work Type View */}
         {viewMode === 'workType' && (
