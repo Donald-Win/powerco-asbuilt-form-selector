@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -310,6 +310,19 @@ const AsBuiltFormSelector = () => {
       cert.name.toLowerCase().includes(formSearchTerm.toLowerCase())
     );
 
+  // Filter tailgate form based on search
+  const showTailgate = formSearchTerm === '' ||
+    tailgateForm.id.toLowerCase().includes(formSearchTerm.toLowerCase()) ||
+    tailgateForm.name.toLowerCase().includes(formSearchTerm.toLowerCase());
+
+  // Filter test sheets based on search
+  const filteredTestSheets = Object.entries(testSheets)
+    .filter(([id, sheet]) =>
+      formSearchTerm === '' ||
+      id.toLowerCase().includes(formSearchTerm.toLowerCase()) ||
+      sheet.name.toLowerCase().includes(formSearchTerm.toLowerCase())
+    );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="max-w-6xl mx-auto p-4 md:p-6 pb-16">
@@ -577,7 +590,76 @@ const AsBuiltFormSelector = () => {
               </div>
             </div>
 
-            {/* As-Built Forms */}
+            {/* Tailgate Form - FIRST */}
+            {showTailgate && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <FileText className="text-orange-600" size={24} />
+                  Pre-Work Risk Assessment
+                </h2>
+                
+                <div
+                  onClick={() => handleFormClick(`forms/${tailgateForm.fileName}`)}
+                  className="p-4 border-2 border-orange-200 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100 hover:border-orange-300 active:bg-orange-200 transition-all"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="font-bold text-orange-900">
+                          {tailgateForm.id}
+                        </p>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-600 text-white text-xs rounded-full">
+                          <Download size={10} />
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        {tailgateForm.name}
+                      </p>
+                    </div>
+                    <ExternalLink className="flex-shrink-0 text-orange-600" size={18} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Test Sheets - SECOND */}
+            {filteredTestSheets.length > 0 && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <FileText className="text-purple-600" size={24} />
+                  Test & Verification Sheets ({filteredTestSheets.length})
+                </h2>
+                
+                <div className="grid md:grid-cols-2 gap-3">
+                  {filteredTestSheets.map(([id, sheet]) => (
+                    <div
+                      key={id}
+                      onClick={() => handleFormClick(`forms/${sheet.fileName}`)}
+                      className="p-4 border-2 border-purple-200 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 hover:border-purple-300 active:bg-purple-200 transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <p className="font-bold text-purple-900">
+                              {id}
+                            </p>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
+                              <Download size={10} />
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700">
+                            {sheet.name}
+                          </p>
+                        </div>
+                        <ExternalLink className="flex-shrink-0 text-purple-600" size={18} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* As-Built Forms - THIRD */}
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <FileText className="text-indigo-600" size={24} />
@@ -624,7 +706,7 @@ const AsBuiltFormSelector = () => {
               </div>
             </div>
 
-            {/* Commissioning Certificates */}
+            {/* Commissioning Certificates - FOURTH */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <FileText className="text-green-600" size={24} />
