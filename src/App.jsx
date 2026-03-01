@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase, X, Printer, Share2 } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '2.1.1';
+const APP_VERSION = '2.1.2';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -260,8 +260,30 @@ const AsBuiltFormSelector = () => {
   };
 
   const handleFormClick = (url, name) => {
-    // Detect iOS
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // Improved iOS detection (works with modern iPads)
+    const isIOS = (() => {
+      // Check for iOS devices
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      
+      // iPhone, iPod
+      if (/iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return true;
+      }
+      
+      // iPad detection (iOS 13+ reports as Mac)
+      if (navigator.maxTouchPoints && 
+          navigator.maxTouchPoints > 2 && 
+          /MacIntel/.test(navigator.platform)) {
+        return true;
+      }
+      
+      // Older iPad detection
+      if (/iPad/.test(userAgent) && !window.MSStream) {
+        return true;
+      }
+      
+      return false;
+    })();
     
     if (isIOS) {
       // On iOS: Open in modal viewer
