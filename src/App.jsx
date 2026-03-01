@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '1.3.9';
+const APP_VERSION = '1.3.10';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -167,7 +167,7 @@ const AsBuiltFormSelector = () => {
     }
   };
 
-  // Work type to forms mapping based on the matrix
+  // Work type to forms mapping
   const workTypeMapping = {
     'LV Service Connection - OH and UG': {
       forms: ['360S014EA'],
@@ -285,7 +285,7 @@ const AsBuiltFormSelector = () => {
 
   // Get all forms for browse mode
   const allAsBuiltForms = Object.entries(formDefinitions)
-    .filter(([id]) => id !== 'MFG_CERT')
+    .filter(([id]) => id !== 'MFG_CERT') // Exclude manufacturer certs from main list
     .map(([id, form]) => ({
       id,
       name: form.name,
@@ -296,6 +296,24 @@ const AsBuiltFormSelector = () => {
     .filter(form => 
       form.id.toLowerCase().includes(formSearchTerm.toLowerCase()) ||
       form.name.toLowerCase().includes(formSearchTerm.toLowerCase())
+    );
+
+  // Tailgate form (filtered)
+  const tailgateVisible =
+    tailgateForm.id.toLowerCase().includes(formSearchTerm.toLowerCase()) ||
+    tailgateForm.name.toLowerCase().includes(formSearchTerm.toLowerCase());
+
+  // Test sheets (filtered)
+  const allTestSheets = Object.entries(testSheets)
+    .map(([id, sheet]) => ({
+      id,
+      name: sheet.name,
+      url: `forms/${sheet.fileName}`,
+      hasLink: true
+    }))
+    .filter(sheet =>
+      sheet.id.toLowerCase().includes(formSearchTerm.toLowerCase()) ||
+      sheet.name.toLowerCase().includes(formSearchTerm.toLowerCase())
     );
 
   const allCommissioningForms = Object.entries(commissioningCerts)
@@ -312,7 +330,7 @@ const AsBuiltFormSelector = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <div className="max-w-6xl mx-auto p-4 md:p-6 pb-16">
+      <div className="max-w-6xl mx-auto p-4 md:p-6">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
@@ -471,13 +489,7 @@ const AsBuiltFormSelector = () => {
                   ))}
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-xs text-blue-800">
-                    <strong>Reminder:</strong> Depending on the work undertaken, one or multiple as-built forms may be required. Pre-commissioning and commissioning test forms should be uploaded separately from the workpack.
-                  </p>
-                </div>
-
-                {/* Commissioning & Test Certificates Section */}
+                {/* Commissioning Certificates */}
                 {requiredCerts.length > 0 && (
                   <div className="mt-6">
                     <button
@@ -535,12 +547,6 @@ const AsBuiltFormSelector = () => {
                             </div>
                           </div>
                         ))}
-
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <p className="text-xs text-green-800">
-                            <strong>Note:</strong> These commissioning and test certificates verify that installed equipment is safe and ready for service. Complete and submit these separately from as-built documentation forms.
-                          </p>
-                        </div>
                       </div>
                     )}
                   </div>
@@ -553,7 +559,7 @@ const AsBuiltFormSelector = () => {
               <div className="bg-white rounded-xl shadow-lg p-12 text-center">
                 <FileText className="mx-auto text-gray-400 mb-4" size={48} />
                 <p className="text-gray-600">
-                  Select a type of work above to see the required forms
+                  Select a type of work above to see the required as-built forms
                 </p>
               </div>
             )}
@@ -576,6 +582,65 @@ const AsBuiltFormSelector = () => {
                 />
               </div>
             </div>
+
+            {/* Tailgate Form */}
+            {tailgateVisible && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <FileText className="text-orange-500" size={24} />
+                  Pre-Work
+                </h2>
+                <div
+                  onClick={() => handleFormClick(`forms/${tailgateForm.fileName}`)}
+                  className="p-4 border-2 border-orange-200 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100 hover:border-orange-300 active:bg-orange-200 transition-all"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="font-bold text-orange-900">{tailgateForm.id}</p>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-500 text-white text-xs rounded-full">
+                          <Download size={10} />
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700">{tailgateForm.name}</p>
+                    </div>
+                    <ExternalLink className="flex-shrink-0 text-orange-500" size={18} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Test Sheets */}
+            {allTestSheets.length > 0 && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <FileText className="text-purple-600" size={24} />
+                  Test Sheets ({allTestSheets.length})
+                </h2>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {allTestSheets.map((sheet) => (
+                    <div
+                      key={sheet.id}
+                      onClick={() => handleFormClick(sheet.url)}
+                      className="p-4 border-2 border-purple-200 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 hover:border-purple-300 active:bg-purple-200 transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <p className="font-bold text-purple-900">{sheet.id}</p>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
+                              <Download size={10} />
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700">{sheet.name}</p>
+                        </div>
+                        <ExternalLink className="flex-shrink-0 text-purple-600" size={18} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* As-Built Forms */}
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -682,4 +747,4 @@ const AsBuiltFormSelector = () => {
   );
 };
 
-export default AsBuiltFormSelector;
+export default AsBuiltFormSelecto
