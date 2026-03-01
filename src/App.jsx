@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase, X, Printer, Share2 } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.1.1';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -260,10 +260,18 @@ const AsBuiltFormSelector = () => {
   };
 
   const handleFormClick = (url, name) => {
-    // Open PDF in modal viewer
-    setCurrentPdfUrl(url);
-    setCurrentPdfName(name || url.split('/').pop());
-    setPdfViewerOpen(true);
+    // Detect iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+      // On iOS: Open in modal viewer
+      setCurrentPdfUrl(url);
+      setCurrentPdfName(name || url.split('/').pop());
+      setPdfViewerOpen(true);
+    } else {
+      // On desktop/Android: Open in new tab
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const handleClosePdf = () => {
@@ -279,33 +287,32 @@ const AsBuiltFormSelector = () => {
     }
   };
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = currentPdfUrl;
-    link.download = currentPdfName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const handleShare = async () => {
-    if (navigator.share) {
+    if (navigator.share && navigator.canShare) {
       try {
+        // Fetch the PDF as a blob
         const response = await fetch(currentPdfUrl);
         const blob = await response.blob();
         const file = new File([blob], currentPdfName, { type: 'application/pdf' });
         
-        await navigator.share({
-          files: [file],
-          title: currentPdfName
-        });
+        // Check if we can share files
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: currentPdfName
+          });
+          // Share successful - stay in modal, don't close
+        } else {
+          // Can't share files, share URL instead
+          await navigator.share({
+            title: currentPdfName,
+            url: currentPdfUrl
+          });
+        }
       } catch (error) {
-        console.log('Share failed, falling back to download');
-        handleDownload();
+        // User cancelled or error - do nothing, stay in modal
+        console.log('Share cancelled or failed');
       }
-    } else {
-      // Fallback to download if share not supported
-      handleDownload();
     }
   };
 
@@ -829,15 +836,6 @@ const AsBuiltFormSelector = () => {
                 <Printer size={20} className="text-gray-700" />
               </button>
               
-              {/* Download Button */}
-              <button
-                onClick={handleDownload}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Download"
-              >
-                <Download size={20} className="text-gray-700" />
-              </button>
-              
               {/* Close Button */}
               <button
                 onClick={handleClosePdf}
@@ -876,13 +874,6 @@ const AsBuiltFormSelector = () => {
             >
               <Printer size={20} />
               <span className="text-xs">Print</span>
-            </button>
-            <button
-              onClick={handleDownload}
-              className="flex flex-col items-center gap-1 px-4 py-2 text-indigo-600"
-            >
-              <Download size={20} />
-              <span className="text-xs">Save</span>
             </button>
           </div>
         </div>
