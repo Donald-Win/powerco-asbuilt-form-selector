@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase } from 'lucide-react';
+import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase, X, Printer, Share2 } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '2.0.2';
+const APP_VERSION = '2.1.0';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -10,6 +10,11 @@ const AsBuiltFormSelector = () => {
   const [showCommissioning, setShowCommissioning] = useState(false);
   const [viewMode, setViewMode] = useState('workType'); // 'workType' or 'allForms'
   const [formSearchTerm, setFormSearchTerm] = useState('');
+  
+  // PDF Viewer Modal State
+  const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  const [currentPdfUrl, setCurrentPdfUrl] = useState('');
+  const [currentPdfName, setCurrentPdfName] = useState('');
 
   // Form definitions with local file paths
   // PDFs should be placed in the public/forms/ folder
@@ -254,8 +259,54 @@ const AsBuiltFormSelector = () => {
     }
   };
 
-  const handleFormClick = (url) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+  const handleFormClick = (url, name) => {
+    // Open PDF in modal viewer
+    setCurrentPdfUrl(url);
+    setCurrentPdfName(name || url.split('/').pop());
+    setPdfViewerOpen(true);
+  };
+
+  const handleClosePdf = () => {
+    setPdfViewerOpen(false);
+    setCurrentPdfUrl('');
+    setCurrentPdfName('');
+  };
+
+  const handlePrint = () => {
+    const iframe = document.getElementById('pdf-iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.print();
+    }
+  };
+
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = currentPdfUrl;
+    link.download = currentPdfName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        const response = await fetch(currentPdfUrl);
+        const blob = await response.blob();
+        const file = new File([blob], currentPdfName, { type: 'application/pdf' });
+        
+        await navigator.share({
+          files: [file],
+          title: currentPdfName
+        });
+      } catch (error) {
+        console.log('Share failed, falling back to download');
+        handleDownload();
+      }
+    } else {
+      // Fallback to download if share not supported
+      handleDownload();
+    }
   };
 
   // Filter work types based on search
@@ -367,15 +418,6 @@ const AsBuiltFormSelector = () => {
           </div>
         </div>
 
-        {/* iPad/iOS Helper Banner */}
-        {/iPad|iPhone|iPod/.test(navigator.userAgent) && (
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg mb-6">
-            <p className="text-sm text-blue-900">
-              <strong>💡 iPad Tip:</strong> After opening a form, tap the <strong>Share</strong> button (□↑) at the top of the screen to save or print. Swipe down to return to this app.
-            </p>
-          </div>
-        )}
-
         {/* Work Type View */}
         {viewMode === 'workType' && (
           <>
@@ -441,7 +483,7 @@ const AsBuiltFormSelector = () => {
                   {requiredForms.map((form, index) => (
                     <div
                       key={form.id}
-                      onClick={() => form.hasLink && handleFormClick(form.url)}
+                      onClick={() => form.hasLink && handleFormClick(form.url, form.name)}
                       className={`p-4 border-2 rounded-lg ${
                         form.hasLink 
                           ? 'border-indigo-200 bg-indigo-50 cursor-pointer hover:bg-indigo-100 hover:border-indigo-300 active:bg-indigo-200 transition-all'
@@ -471,7 +513,7 @@ const AsBuiltFormSelector = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleFormClick(form.alternateUrl);
+                                handleFormClick(form.alternateUrl, form.name);
                               }}
                               className="mt-2 text-xs text-indigo-600 hover:text-indigo-800 underline flex items-center gap-1"
                             >
@@ -524,7 +566,7 @@ const AsBuiltFormSelector = () => {
                         {requiredCerts.map((cert, index) => (
                           <div
                             key={cert.id}
-                            onClick={() => cert.hasLink && handleFormClick(cert.url)}
+                            onClick={() => cert.hasLink && handleFormClick(cert.url, cert.name)}
                             className={`p-4 border-2 rounded-lg ${
                               cert.hasLink 
                                 ? 'border-green-200 bg-green-50 cursor-pointer hover:bg-green-100 hover:border-green-300 active:bg-green-200 transition-all'
@@ -608,7 +650,7 @@ const AsBuiltFormSelector = () => {
                 </h2>
                 
                 <div
-                  onClick={() => handleFormClick(`forms/${tailgateForm.fileName}`)}
+                  onClick={() => handleFormClick(`forms/${tailgateForm.fileName}`, tailgateForm.name)}
                   className="p-4 border-2 border-orange-200 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100 hover:border-orange-300 active:bg-orange-200 transition-all"
                 >
                   <div className="flex items-start gap-3">
@@ -643,7 +685,7 @@ const AsBuiltFormSelector = () => {
                   {filteredTestSheets.map(([id, sheet]) => (
                     <div
                       key={id}
-                      onClick={() => handleFormClick(`forms/${sheet.fileName}`)}
+                      onClick={() => handleFormClick(`forms/${sheet.fileName}`, sheet.name)}
                       className="p-4 border-2 border-purple-200 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 hover:border-purple-300 active:bg-purple-200 transition-all"
                     >
                       <div className="flex items-start gap-3">
@@ -752,6 +794,99 @@ const AsBuiltFormSelector = () => {
           </>
         )}
       </div>
+
+      {/* PDF Viewer Modal */}
+      {pdfViewerOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
+          {/* Header Bar */}
+          <div className="bg-white shadow-lg p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <FileText className="text-indigo-600 flex-shrink-0" size={24} />
+              <h2 className="font-semibold text-gray-900 truncate text-sm md:text-base">
+                {currentPdfName}
+              </h2>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 ml-4">
+              {/* Share Button (iOS/Android) */}
+              {navigator.share && (
+                <button
+                  onClick={handleShare}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Share"
+                >
+                  <Share2 size={20} className="text-gray-700" />
+                </button>
+              )}
+              
+              {/* Print Button */}
+              <button
+                onClick={handlePrint}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Print"
+              >
+                <Printer size={20} className="text-gray-700" />
+              </button>
+              
+              {/* Download Button */}
+              <button
+                onClick={handleDownload}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Download"
+              >
+                <Download size={20} className="text-gray-700" />
+              </button>
+              
+              {/* Close Button */}
+              <button
+                onClick={handleClosePdf}
+                className="p-2 hover:bg-red-100 rounded-lg transition-colors ml-2"
+                title="Close"
+              >
+                <X size={24} className="text-red-600" />
+              </button>
+            </div>
+          </div>
+
+          {/* PDF Viewer */}
+          <div className="flex-1 bg-gray-900 overflow-hidden">
+            <iframe
+              id="pdf-iframe"
+              src={currentPdfUrl}
+              className="w-full h-full border-0"
+              title={currentPdfName}
+            />
+          </div>
+
+          {/* Bottom Action Bar (Mobile) */}
+          <div className="md:hidden bg-white shadow-lg p-3 flex justify-around">
+            {navigator.share && (
+              <button
+                onClick={handleShare}
+                className="flex flex-col items-center gap-1 px-4 py-2 text-indigo-600"
+              >
+                <Share2 size={20} />
+                <span className="text-xs">Share</span>
+              </button>
+            )}
+            <button
+              onClick={handlePrint}
+              className="flex flex-col items-center gap-1 px-4 py-2 text-indigo-600"
+            >
+              <Printer size={20} />
+              <span className="text-xs">Print</span>
+            </button>
+            <button
+              onClick={handleDownload}
+              className="flex flex-col items-center gap-1 px-4 py-2 text-indigo-600"
+            >
+              <Download size={20} />
+              <span className="text-xs">Save</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Version Number - Fixed to bottom right */}
       <div style={{
