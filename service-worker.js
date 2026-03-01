@@ -1,7 +1,7 @@
 // service-worker.js
 // Auto-updating service worker for Powerco Forms App
 
-const CACHE_VERSION = 'v1.3.10'; // Increment this to force cache refresh
+const CACHE_VERSION = 'v1.3.11'; // Increment this to force cache refresh
 const CACHE_NAME = `powerco-forms-${CACHE_VERSION}`;
 
 // Files to cache for offline use (app shell)
