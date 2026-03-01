@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, CheckCircle2, Circle, ExternalLink, Download, ChevronDown, ChevronUp, List, Briefcase } from 'lucide-react';
 
 // Version number - update this when releasing new version
-const APP_VERSION = '1.3.7';
+const APP_VERSION = '1.3.8';
 
 const AsBuiltFormSelector = () => {
   const [selectedWork, setSelectedWork] = useState('');
@@ -296,7 +296,7 @@ const AsBuiltFormSelector = () => {
             <FileText className="text-indigo-600" size={32} />
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                Powerco Forms
+                Don's Field Forms
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Select forms by work type or browse all available forms
